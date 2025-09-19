@@ -1,0 +1,131 @@
+====== Exercise 6 - SQL Basics 5 ======
+
+
+1 | Add the following departments on the departments table:
+	- ID: AAAA0001, Name: North, Duty: Accounting, Budget: 200000, Start date: 2018-02-02, Manager: William Brown, CreatedAt: use today's date
+	- ID: AABB0002, Name: South, Duty: Marketing, Budget: 400000, Start date: 2018-02-22, Manager: Steven Buchanan, CreatedAt: use today's date
+	- ID: AACC0003, Name: West, Duty: Management, Budget: 800000, Start date: 2018-01-12, Manager: Janet Leverling, CreatedAt: use today's date
+
+1 | Lisää seuraavat osastot aikaisemmin luotuun departments-tauluun:
+	- ID: AAAA0001, Nimi: North, Duty: Accounting, Budget: 200000, Start date: 2018-02-02, Manageri: William Brown, CreatedAt: käytä tämän päivän päivämäärää
+	- ID: AABB0002, Nimi: South, Duty: Marketing, Budget: 400000, Start date: 2018-02-22, Manageri: Steven Buchanan, CreatedAt: käytä tämän päivän päivämäärää
+	- ID: AACC0003, Nimi: West, Duty: Management, Budget: 800000, Start date: 2018-01-12, Manageri: Janet Leverling, CreatedAt: käytä tämän päivän päivämäärää
+--------------------------------------------------
+insert into departments (DepartmentID, DepartmentName, Duty, Budget, StartDate, EmployeeID, CreatedAt) values
+('AAAA0001', 'North', 'Accounting', 200000, '2018-02-02', 13, now()),
+('AABB0002', 'South', 'Marketing', 400000, '2018-02-22', 5, now()),
+('AACC0003', 'West', 'Management', 800000, '2018-01-12', 3, now());
+--------------------------------------------------
+
+##################################################
+2 | Add the following tasks on the tasks table:
+	- Name: Financial Report Analysis, TaskDescription: Analyze and prepare financial reports for Q1, Start date: 2024-02-01, End date: 2024-06-15, Status: In Progress, Priority: High, Employee: John Smith 
+        - Name: Social Media Campaign, TaskDescription: Plan and execute a social media marketing campaign, Start date: 2024-02-10, End date: 2024-06-28, Status: Pending, Priority: Medium, Employee: Michael Suyama
+	- Name: Strategic Planning, TaskDescription: Develop a strategic plan for the upcoming quarter, Start date: 2024-06-01, End date: 2024-07-20, Status: Not Started, Priority: High, Employee: Anna Davis
+
+2 | Luo seuraavat tehtävät aikaisemmin luotuun tasks-tauluun:
+	- Nimi: Financial Report Analysis, Selite: Analyze and prepare financial reports for Q1, StartDate: 2024-02-01, EndDate: 2024-06-15, Status: In Progress, Priority: High, Työntekijä: John Smith 
+        - Nimi: Social Media Campaign, Selite: Plan and execute a social media marketing campaign, StartDate: 2024-02-10, EndDate: 2024-06-28, Status: Pending, Priority: Medium, Työntekijä: Michael Suyama
+	- Nimi: Strategic Planning, Selite: Develop a strategic plan for the upcoming quarter, StartDate: 2024-06-01, EndDate: 2024-07-20, Status: Not Started, Priority: High, Työntekijä: Anna Davis
+--------------------------------------------------
+insert into tasks (TaskName, TaskDescription, StartDate, EndDate, TaskStatus, Priority, EmployeeID)
+values
+('Financial Report Analysis', 'Analyze and prepare financial reports for Q1', '2024-02-01', '2024-06-15', 'In Progress', 'High', 11),
+('Social Media Campaign', 'Plan and execute a social media marketing campaign', '2024-02-10', '2024-06-28', 'Pending', 'Medium', 6),
+('Strategic Planning', 'Develop a strategic plan for the upcoming quarter', '2024-06-01', '2024-07-20', 'Not Started', 'High', 15);
+--------------------------------------------------
+
+##################################################
+3 | Create the following payment_method table entries for three orders:
+	- Payment type: Credit card, Is credit card: Yes, Card type: Visa, Expiration date: 2024-12-31, Billing address: 123 Main St Cityville
+	- Payment type: PayPal, Is credit card: No, Card type: No value, Expiration date: No value, Billing address: 202 Elm St Countryside
+	- Payment type: Debit card, Is credit card: Yes, Card type: MasterCard, Expiration date: 2025-10-10, Billing address: 789 Pine St Villagetown
+--------------------------------------------------
+insert into payment_methods (PaymentType, IsCreditCard, CardType, ExpirationDate, BillingAddress)
+values
+('Credit card', 1, 'Visa', '2024-12-31', '123 Main St Cityville'),
+('PayPal', 0, null, null, '202 Elm St Countryside'),
+('Debit card', 1, 'MasterCard', '2025-10-10', '789 Pine St Villagetown');
+--------------------------------------------------
+
+##################################################
+4 | Employees Anne Dodsworth, Emily Johnson and Andrew Fuller are working in marketing. Connect them to the corresponding department.
+
+4 | Työntekijät Anne Dodsworth, Emily Johnson ja Andrew Fuller työskentelevät markkinoinnissa. Yhdistä heidät vastaavaan osastoon.
+--------------------------------------------------
+update employees 
+set DepartmentID = 'AABB0002' 
+where employeeID in (9, 14, 2);
+--------------------------------------------------
+
+##################################################
+5 | Update order information for customerID 10 (Bottom-Dollar Marketse) so that it was paid with credit card (Billing address 123 Main St Cityville).
+
+5 | Päivitä tilaustiedot customerID:lle 10 (Bottom-Dollar Marketse), niin että ne maksettiin luottokortilla (Billing address 123 Main St Cityville).
+--------------------------------------------------
+update orders
+set PaymentMethodID = 1
+where customerID = 10;
+--------------------------------------------------
+
+##################################################
+6 | Anna Davis was able to start her task 'Strategic Planning' at last so set the task status to be "In progress" and start date to be today's date.
+
+6 | Anna Davis pystyi viimein aloittamaan tehtävänsä 'Strategic Planning', joten aseta tehtävän tilaksi "In progress" ja aloituspäivämääräksi tämä päivämäärä.
+--------------------------------------------------
+update tasks
+set TaskStatus = 'In progress', StartDate = current_date()
+where TaskID = 3 and employeeID = 15;
+--------------------------------------------------
+
+##################################################
+7 | The company plans to significantly boost marketing for the coming year so double the marketing budget.
+
+7 | Yritys aikoo merkittävästi lisätä markkinointibudjettiaan tulevalle vuodelle, joten tuplaa sen osaston budjetti, jonka vastuualue on Marketing.
+--------------------------------------------------
+update Departments
+set Budget = Budget * 2, StartDate = '2025-01-01'
+where Duty = 'Marketing' and DepartmentID = 'AABB0002';
+--------------------------------------------------
+
+##################################################
+8 | Create a copy of the orders table. The new table should be called orders_backup.
+
+8 | Luo kopio orders-taulusta. Anna uuden taulun nimi timeksi orders_backup.
+--------------------------------------------------
+CREATE TABLE orders_backup AS
+SELECT * FROM orders
+WHERE 1 = 0;
+--------------------------------------------------
+
+##################################################
+9 | Copy the data from orders table into the newly created orders_backup table. Copy only orders that are created after date 2023-08-18.
+
+9 | Kopioi rivit/tiedot orders-taulusta aikasemmin luotuun orders_backup-tauluun. Kopioi vain ne tilaukset, jotka on luotu 2023-08-18 jälkeen.
+--------------------------------------------------
+INSERT INTO orders_backup
+SELECT *
+FROM orders
+WHERE OrderDate >= '2023-08-19 00:00:00';
+--------------------------------------------------
+
+##################################################
+10 | Remove all orders from the orders_backup table without employee if the order was shipped by Swift Shipping or Speedy Express.
+
+10 | Poista seuraavat tilaukset orders_backup-taulusta: jos tilauksella ei ole työntekijää ja tilauksen on toimittanut Swift Shipping tai Speedy Express.
+--------------------------------------------------
+-- 1. Disable safe update mode separately
+SET SQL_SAFE_UPDATES = 0;
+
+-- 2. Perform the deletion separately based on the verified OrderIDs
+DELETE FROM orders_backup
+WHERE OrderID IN (
+    SELECT OrderID
+    FROM orders_backup
+    WHERE EmployeeID IS NULL
+    AND ShipperID IN (1, 5)
+);
+
+-- 3. Re-enable safe update mode separately
+SET SQL_SAFE_UPDATES = 1;
+--------------------------------------------------

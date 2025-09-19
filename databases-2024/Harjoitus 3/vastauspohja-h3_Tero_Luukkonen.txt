@@ -1,0 +1,126 @@
+====== Exercise 3 - SQL Basics 2 ======
+
+1 | Count how many customers have postalcode length of 5. Use aliasname postalcode_count for this column.
+
+1 | Laske kuinka monella asiakkaalla on viiden merkin pituinen postinumero. Anna tälle sarakkeelle aliasnimi postalcode_count.
+--------------------------------------------------
+select count(*) as postalcode_count from customers where length(PostalCode) = 5;
+--------------------------------------------------
+
+##################################################
+2 | Select minimum and maximum price from products with product name starting with letters A, E, K or M.
+
+2 | Hae minimi- ja maksimihinta tuotteille, joiden tuotenimi alkaa kirjaimilla A, E, K tai M.
+--------------------------------------------------
+select min(price), max(price) from products where productName like 'A%' or productName like 'E%' or productName like 'K%' or productName like 'M%';
+--------------------------------------------------
+
+##################################################
+3 | Calculate average price for each categoryID. Present average prices with two decimals and order the result set by average price in descending order.
+
+3 | Laske keskihinta jokaiselle categoryID:lle. Esitä keskihinnat kahden desimaalin tarkkuudella ja järjestä tulosjoukko keskihinnan mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+select CategoryID, round(avg(price), 2) as avg_price from products group by CategoryID order by avg_price desc;
+--------------------------------------------------
+
+##################################################
+4 | Present employees in the following format in one column: <firstname> <lastname> is born in <year>. For example "Anna Davis is born in 1992".
+Use aliasname employee_info for this column. Order the result set by birth year so that youngest employee will be shown first.
+
+4 | Esitä työntekijät seuraavassa muodossa yhdessä sarakkeessa: <etunimi> <sukunimi> on syntynyt <vuonna>. Esimerkiksi "Anna Davis on syntynyt vuonna 1992".
+Anna sarakkeelle aliasnimi employee_info. Järjestä tulostaulukko syntymävuoden mukaan niin, että nuorin työntekijä näytetään ensin.
+--------------------------------------------------
+select concat(FirstName, ' ', LastName, ' is born in ', year(BirthDate)) as employee_info from employees order by year(BirthDate) desc;
+--------------------------------------------------
+
+##################################################
+5 | Select employees who have been in more than 20 orders. Show employeeID and count of orders in the result set. Use order_count aliasname for the column.
+
+5 | Hae työntekijät, jotka ovat olleet yli 20 tilauksessa. Näytä employeeID ja tilausten lukumäärä tulosjoukossa. Anna lukumääräsarakkeelle aliasnimi order_count.
+--------------------------------------------------
+select EmployeeID, count(*) as order_count
+from orders
+group by EmployeeID
+having order_count > 20; 
+--------------------------------------------------
+
+##################################################
+6 | Create usernames for the employees by using the following format: two first letters from the firstname, three last letters from the lastname 
+and length of the employee notes. For example, Nancy Davolio would have a username of Nalio167.
+
+6 | Muodosta työntekijöille käyttäjänimet seuraavassa muodossa: kaksi ensimmäistä kirjainta etunimestä, kolme viimeistä kirjainta sukunimestä ja työntekijän muistiinpanon pituus.
+Esimerkiksi jos työntekijä on Nancy Davolio ja hänen muistiinpanojensa pituus on 167 merkkiä, hänen käyttäjänimensä olisi Nalio167.
+--------------------------------------------------
+select concat(left(FirstName, 2), right(LastName, 3), length(Notes)) as username from employees;
+--------------------------------------------------
+
+##################################################
+7 | Count how many pieces of each product have been sold. Present productID and total amount of sold products in the result set.
+Use alias name total for the column and order the result set by count in descending order.
+
+7| Laske kuinka monta kappaletta kutakin tuotetta on myyty. Esitä productID ja myytyjen tuotteiden kokonaismäärä tulosjoukossa.
+Anna lukumääräsarakkeelle aliasnimi total ja järjestä tulosjoukko lukumäärän mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+select ProductID, sum(quantity) as total
+from Orderdetails
+group by ProductId
+order by total desc;
+--------------------------------------------------
+
+##################################################
+8 | Categorise supplier phone numbers with the following criteria:
+	- If phone number has brackets and a dash included -> Valid
+	- If phone number has either brackets or dash (not both) -> Partly valid
+	- In any other case -> Not a phone number
+Present only phone number and categorised value in the result set.
+
+8 | Luokittele toimittajien puhelinnumerot seuraavien kriteerien perusteella:
+        - Jos puhelinnumerossa on sekä sulkeet että väliviiva -> Valid
+        - Jos puhelinnumerossa on joko sulkeet tai väliviiva (ei molempia) -> Partly valid
+        - Muussa tapauksessa -> Not a phone number
+Esitä tulosjoukossa vain puhelinnumero ja luokiteltu arvo.
+--------------------------------------------------
+select Phone,
+  case
+    when phone like '%(%' and phone like '%)%' and phone like '%-%' then 'Valid'
+    when (phone like '%(%' and phone like '%)%') xor phone like '%-%' then 'Partly valid'
+    else 'Not a phone number'
+  end as categorised_value
+  from suppliers
+--------------------------------------------------
+
+##################################################
+9 | Show number of orders for each customerID. Include only orders that have been shipped by shipperID 1 or 3.
+Only those customers should be presented in the result set who have done 3 or more orders. Result set should include
+customerID and order count (use aliasname number_of_orders for the column).
+
+9 | Hae tilausten lukumäärä jokaiselle customerID:lle. Näytä vain ne tilaukset, jotka on toimitettu kuljetusyrityksillä joiden shipperID on 1 tai 3.
+Näytä vain ne asiakkaat, jotka ovat tehneet vähintään 3 tilausta.
+Tulosjoukkossa pitää olla sarakkeet customerID ja tilausten lukumäärä (käytä sarakkeelle aliasnimeä number_of_orders).
+--------------------------------------------------
+select customerID, count(*) as number_of_orders
+from orders
+where ShipperID in (1, 3)
+group by customerID
+having number_of_orders >= 3;
+--------------------------------------------------
+
+##################################################
+10 | Do the following calculations for each supplierID:
+	- total price of products (use alias total_price)
+	- average price of products (use alias average_price and present without decimals)
+	- amount of products (use alias amount_of_products)
+	- amount of missing product price values (use alias null_count)
+For example, supplierID 1 has the following values (total_price: 85, average_price: 17, amount_of_products: 5, null_count: 0)
+
+10 |Tee seuraavat laskelmat jokaiselle supplierID:lle:
+        - tuotteiden kokonaishinta (käytä aliasnimeä total_price)
+        - tuotteiden keskihinta (käytä aliasnimeä average_price ja esitä keskihinta ilman desimaaleja)
+        - tuotteiden määrä (käytä aliasnimeä amount_of_products)
+        - puuttuvien tuotehintatietojen määrä (käytä aliasnimeä null_count)
+Esimerkiksi, supplierID 1 on seuraavat arvot (total_price: 85, average_price: 17, amount_of_products: 5, null_count: 0)
+--------------------------------------------------
+select SupplierID, sum(price) as total_price, round(avg(price)) as average_price, count(ProductID) as amount_of_products, count(case when Price is null then 1 end) as null_count  
+from products
+group by SupplierID;
+--------------------------------------------------

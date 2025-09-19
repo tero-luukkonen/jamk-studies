@@ -1,0 +1,96 @@
+====== Exercise 2 - SQL Basics 1 ======
+
+1 | Select customers where name begins with letter B and customerID is less than 10.
+
+1 | Hae asiakkaat, joiden nimi alkaa kirjaimella B ja customerID on alle 10.
+--------------------------------------------------
+SELECT * FROM customers WHERE CustomerName LIKE 'B%' AND CustomerID < 10;
+--------------------------------------------------
+
+##################################################
+2 | Select orders made in 18th of August 2023. Order the result set by order date in ascending order.
+
+2 | Hae tilaukset, jotka on tehty 18. elokuuta 2023. Järjestä tulosjoukko tilauspäivämäärän mukaan nousevassa järjestyksessä.
+--------------------------------------------------
+SELECT * FROM orders WHERE DATE(OrderDate) = '2023-08-18' ORDER BY OrderDate ASC;
+--------------------------------------------------
+
+##################################################
+3 | Select all different cities (no duplicates) where customers live with city name ending in letter N. Order the result set by city name in descending order.
+
+3 | Hae kaikki eri kaupungit (ei toistoja), joissa asiakkaat asuvat ja joiden kaupungin nimi päättyy kirjaimeen N. Järjestä tulosjoukko kaupungin nimen mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+SELECT DISTINCT City FROM customers WHERE City LIKE '%N' ORDER BY City DESC;
+--------------------------------------------------
+
+##################################################
+4 | Select customer companies whose contact person's last name starts with the letter S and the country is either Spain or USA.
+
+4 | Hae asiakasyritykset, joiden yhteyshenkilön sukunimi alkaa kirjaimella S ja maa on joko Espanja tai USA.
+--------------------------------------------------
+SELECT CustomerName FROM customers WHERE (ContactName LIKE '% S%' OR ContactName LIKE '% % S%') AND (Country = 'Spain' OR Country = 'USA');
+--------------------------------------------------
+
+##################################################
+5 | Select orderID and order date of orders that are missing an employee.
+
+5 | Hae orderID ja tilauksen päivämäärä tilauksista, joista puuttuu työntekijä.
+--------------------------------------------------
+SELECT OrderID, OrderDate FROM orders WHERE EmployeeID IS NULL;
+--------------------------------------------------
+
+##################################################
+6 | Select employees born in 1950s or 1980s.
+
+6 | Hae 1950-luvulla tai 1980-luvulla syntyneet työntekijät.
+--------------------------------------------------
+SELECT EmployeeID, LastName, FirstName, BirthDate, Photo, Notes FROM employees WHERE BirthDate BETWEEN '1950-01-01' AND '1959-12-31' OR BirthDate BETWEEN '1980-01-01' AND '1989-12-31';
+--------------------------------------------------
+
+##################################################
+7 | Select orders with the following criteria:
+	- OrderID in range 10300 - 10350
+	- ProductID equal or lower than 40
+	- Quantity either 10, 20, 30 or 40
+Order the result set by quantity in descending order.
+
+7 | Hae tilaukset seuraavin kriteerein:
+        - OrderID välillä 10300 - 10350
+        - ProductID on yhtä suuri tai pienempi kuin 40
+        - Määrä on joko 10, 20, 30 tai 40
+Järjestä tulosjoukko määrän mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+SELECT * FROM OrderDetails WHERE OrderID BETWEEN 10300 AND 10350 AND ProductID <= 40 AND Quantity IN (10, 20, 30, 40) ORDER BY Quantity DESC;
+--------------------------------------------------
+
+##################################################
+8 | Select suppliers whose phone number meets the following criteria:
+	- there must be a pair of brackets () with two numbers between them
+	- dash character must be present somewhere in the phone number after the brackets
+
+8 | Hae toimittajat, joiden puhelinnumero täyttää seuraavat kriteerit:
+        - Puhelinnumerossa on oltava sulkeet () ja niiden välissä kaksi numeroa
+        - Väliviiva-merkki (-) on oltava jossain kohdassa sulkeiden jälkeen
+--------------------------------------------------
+SELECT * FROM suppliers where Phone like '%(__)%-%';
+--------------------------------------------------
+
+##################################################
+9 | Select products with price being in range 20-40 (inclusive) and in addition, one of the following conditions should be met:
+	- categoryID being 2, 4 or 6
+	- product name starting with letter A
+
+9 | Hae tuotteet, joiden hinta on välillä 20-40 (20 ja 40 mukaan lukien), ja lisäksi jonkin seuraavista ehdoista on täytettävä:
+        - categoryID on 2, 4 tai 6
+        - tuotteen nimi alkaa kirjaimella A
+--------------------------------------------------
+SELECT * FROM products WHERE Price BETWEEN 20 AND 40 AND (CategoryID IN(2, 4, 6) OR ProductName LIKE 'A%');
+--------------------------------------------------
+
+##################################################
+10 | Select products whose unit is measured in either grams (g) or kilograms (kg) and both supplierID and categoryID are between 5 and 10 (inclusive).
+
+10 | Hae tuotteet, joiden yksikkö on mitattu joko grammoissa (g) tai kilogrammoissa (kg) ja sekä supplierID ja categoryID ovat välillä 5 ja 10 (5 ja 10 mukaan lukien).
+--------------------------------------------------
+SELECT * FROM products WHERE (Unit LIKE '% g %' OR Unit LIKE '% kg %') AND SupplierID BETWEEN 5 AND 10 AND CategoryID BETWEEN 5 AND 10;
+--------------------------------------------------

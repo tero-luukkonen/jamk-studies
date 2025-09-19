@@ -1,0 +1,202 @@
+====== Exercise 5 - SQL Basics 4 ======
+
+
+1 | Create a new table called departments with the following information:
+	- DepartmentID: Unique identifier for each department. It must be eight characters long and consist of four letters and four numbers (for example AABB0011).
+	- DepartmentName: Name of the department.
+	- Duty: Department responsibilities.
+	- Budget: Budget that is allocated to the department for a specific period.
+	- StartDate: The date when the department was established.
+
+1 | Luo uusi taulu nimeltään departments seuraavilla tiedoilla (ei tarvitse tehdä rajoitteita/triggereitä, löydä sopivat tietotyypit!):
+        - DepartmentID: Uniikki tunniste jokaiselle osastolle. Sen on oltava kahdeksan merkkiä pitkä ja koostuttava neljästä kirjaimesta ja neljästä numerosta (esimerkiksi AABB0011).
+        - DepartmentName: Osaston nimi.
+        - Duty: Osaston vastuut.
+        - Budget: Osastolle määritetty budjetti tiettyä ajanjaksoa varten.
+        - StartDate: Päivämäärä, jolloin osasto perustettiin.
+
+--------------------------------------------------
+create table departments (
+DepartmentID char(8) primary key,
+DepartmentName varchar(255) not null,
+Duty text,
+Budget decimal(15, 2),
+StartDate date
+);
+--------------------------------------------------
+
+##################################################
+2 | Use a separate query to add a new column to departments table.
+Then connect employees table information with this table. Each department should have a manager who is chosen from among the employees.
+
+2 | Käytä erillistä käskyä lisätäksesi uusi sarake nimeltä EmployeeID departments-tauluun.
+Tämän jälkeen yhdistä employees-taulu departments-tauluun. Uusi sarake kuvastaa manageria, joka valitaan työntekijöiden joukosta.
+--------------------------------------------------
+alter table departments
+add column EmployeeID int(11) not null,
+add constraint fk_EmployeeID foreign key(EmployeeID)
+references employees (EmployeeID);
+--------------------------------------------------
+
+##################################################
+3 | Add the following two new columns for departments table using a separate query:
+	- CreatedAt: This should be a column with date and time information indicating when the data was initially created.
+	- UpdatedAt: This should also contain a date and time information, but will be automatically updated when data in a row is updated.
+
+3 | Lisää seuraavat kaksi uutta saraketta departments-tauluun käyttäen erillisiä käskyjä (ei tarvitse tehdä rajoitteita/triggereitä):
+        - CreatedAt: Tämä sarake päivämäärä- ja aikatiedolla, joka osoittaa milloin tiedot luotiin alun perin.
+        - UpdatedAt: Tämä sarake sisältää myös päivämäärä- ja aikatiedon, mutta päivittyy automaattisesti kun rivin tietoja päivitetään.
+
+--------------------------------------------------
+alter table departments
+add column CreatedAt datetime not null default current_timestamp;
+
+alter table departments
+add column UpdatedAt datetime not null default current_timestamp on update current_timestamp;
+--------------------------------------------------
+
+##################################################
+4 | Add a department information to each of the employees so that each employee would belong to one department.
+
+4 | Lisää osastotieto työntekijöille niin, että jokainen työntekijä voi tarvittaessa kuulua yhteen osastoon.
+--------------------------------------------------
+alter table employees
+add column DepartmentID char(8),
+add constraint fk_DepartmentID foreign key (DepartmentID)
+references departments (DepartmentID);
+--------------------------------------------------
+
+##################################################
+5 | Create a table called tasks with the following information:
+	- TaskID: Unique identifier for each task which is an integer that will be automatically created each time a new row is added to the table.
+	- TaskName: Name for the task.
+	- TaskDescription: A detailed description of the task. This field could contain a lot of information.
+	- StartDate: Start date for the task.
+	- EndDate: End date for the task.
+	- TaskStatus: This field should indicate the status of the task (for example "In progress", "Completed", "Pending").
+	- Priority: The priority level of the task (for example "High", "Medium", "Low").
+
+5 | Luo uusi taulu nimeltä tasks seuraavilla tiedoilla (ei tarvitse tehdä rajoitteita/triggereitä, löydä sopivat tietotyypit!):
+        - TaskID: Uniikki tunniste jokaiselle tehtävälle, joka on kokonaisluku ja joka luodaan automaattisesti aina kun uusi rivi lisätään taulukkoon.
+        - TaskName: Tehtävän nimi.
+        - TaskDescription: Yksityiskohtainen kuvaus tehtävästä. Tämä kenttä voi sisältää paljon tietoa.
+        - StartDate: Tehtävän aloituspäivä.
+        - EndDate: Tehtävän päättymispäivä.
+        - TaskStatus: Tämän kentän tulisi osoittaa tehtävän tila (esimerkiksi "In progress", "Completed", "Pending").
+        - Priority: Tehtävän prioriteettitaso (esimerkiksi High", "Medium", "Low").
+
+Sinun ei tarvitse tehdä rajoitteita/triggereitä, löydä vain sopiva tietotyyppi!
+--------------------------------------------------
+create table tasks (
+TaskID int auto_increment primary key,
+TaskName varchar(255) not null,
+TaskDescription longtext,
+StartDate date,
+EndDate date,
+TaskStatus varchar(50) not null,
+Priority varchar(50) not null
+);
+--------------------------------------------------
+
+##################################################
+6 | Connect tasks table with the employee information so that each task would be dedicated to one employee.
+
+6 | Yhdistä tasks-taulu ja employees-taulu niin, että jokainen tehtävä on omistettu yhdelle työntekijälle.
+--------------------------------------------------
+alter table tasks
+add column EmployeeID int(11) not null,
+add constraint fk_EmployeeID_2 foreign key (EmployeeID)
+references employees (EmployeeID);
+--------------------------------------------------
+
+##################################################
+7 | Create a new table called payment_methods with the following information
+	- PaymentMethodID: A unique identifier for each payment method.
+	- PaymentType: Type indicating what kind of payment method is used (Bank transfer, PayPal etc.).
+	- IsCreditCard: Value describing whether the credit card is used for payment.
+	- CardType: This is an optional field for describing the credit card type (Visa, MasterCard etc.).
+	- ExpirationDate: This is also an optional field for the credit card expiration date.
+	- BillingAddress: Billing address associated with the payment.
+
+7 | Luo uusi taulu nimeltä payment_methods seuraavilla tiedoilla (ei tarvitse tehdä rajoitteita/triggereitä, löydä sopivat tietotyypit!):
+        - PaymentMethodID: Uniikki tunniste jokaiselle maksutavalle.
+        - PaymentType: Tyyppi, joka kertoo, millaista maksutapaa käytetään (Pankkisiirto, PayPal jne.).
+        - IsCreditCard: arvo, joka kuvaa käytetäänkö maksussa luottokorttia.
+        - CardType: Tämä on valinnainen kenttä, joka kuvaa luottokortin tyyppiä (Visa, MasterCard jne.).
+        - ExpirationDate: Tämä on myös valinnainen kenttä luottokortin vanhentumispäivämäärälle.
+        - BillingAddress: Laskutusosoite, joka liittyy maksuun.
+--------------------------------------------------
+create table payment_methods (
+PaymentMethodID int auto_increment primary key,
+PaymentType varchar(100) not null,
+IsCreditCard tinyint(1) not null,
+CardType varchar(100),
+ExpirationDate date,
+BillingAddress varchar(255) not null
+);
+--------------------------------------------------
+
+##################################################
+8 | Connect payment_methods table with orders table so that each order has a payment method set.
+
+8 | Yhdistä payment_methods-taulu ja orders-taulu niin, että jokaisella tilauksella on määritetty maksutapa.
+--------------------------------------------------
+alter table orders
+add column PaymentMethodID int(11) not null default 1,
+add constraint fk_PaymentMethodID foreign key (PaymentMethodID)
+references payment_methods (PaymentMethodID)
+on update cascade
+on delete cascade;
+--------------------------------------------------
+
+##################################################
+9 | Create a trigger for the departments table that checks both of the following conditions:
+	- The new value for the budget field cannot exceed one million (this applies only for the new data, updated data can exceed one million).
+	- The length of the value to be inserted into the DepartmentID field must be exactly eight characters long.
+
+9 | Luo triggeri departments-taululle, joka tarkistaa molemmat ehdot:
+        - budget-kenttään lisättävä uusi arvo ei saa ylittää miljoonaa (tämä koskee vain uusia tietoja, päivitetyt tiedot voivat ylittää miljoonan).
+        - Merkkijonon pituuden, joka lisätään DepartmentsID-kenttään. Merkkijonon on oltava tarkalleen kahdeksan merkkiä pitkä.
+--------------------------------------------------
+delimiter $$
+create trigger tri1_departments
+before insert on departments
+for each row
+	begin
+		if new.Budget > 1000000 then
+        signal sqlstate '45000'
+        set message_text = 'Budget cannot exceed one million for new departments';
+	end if;
+    
+		if char_length(new.DepartmentID) != 8 then
+        signal sqlstate '45000'
+        set message_text = 'DepartmentID must be exactly eight characters long';
+    end if;
+end $$
+--------------------------------------------------
+
+##################################################
+10 | Create a trigger for the tasks table that checks both of the following conditions:
+	- The value of EndDate field must not be in the past.
+	- Priority value must be one of the following: Low, Medium or High.
+
+10 | Luo triggeri tasks-taululle, joka tarkistaa molemmat ehdot:
+        - EndDate-kentän arvon ei tule olla menneisyydessä.
+        - Priority-kentän arvon tulee olla yksi seuraavista: Low, Medium tai High.
+--------------------------------------------------
+delimiter $$
+create trigger tri1_tasks
+before insert on tasks
+for each row
+	begin
+		if new.EndDate < current_date() then
+        signal sqlstate '45000'
+        set message_text = 'End Date cannot be in the past';
+	end if;
+    
+		if new.Priority not in ('Low', 'Medium', 'High') then
+        signal sqlstate '45000'
+        set message_text = 'Priority must be one of: Low, Medium, High';
+    end if;
+end $$
+--------------------------------------------------

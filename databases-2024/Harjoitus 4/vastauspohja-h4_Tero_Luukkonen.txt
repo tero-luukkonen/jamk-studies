@@ -1,0 +1,158 @@
+====== Exercise 4 - SQL Basics 3 ======
+
+
+1 | Present all products with productname, categoryname and product price included in the result set. Select also products without the category.
+
+
+1 | Näytä kaikkien tuotteiden tuotenimet, kategorianimet ja tuotteiden hinnat tulosjoukossa. Ota mukaan myös tuotteet ilman kategoriaa.
+--------------------------------------------------
+select productName, CategoryName, price
+from products left join categories
+on products.CategoryID = categories.CategoryID;
+--------------------------------------------------
+
+##################################################
+2 | Select products having price higher than the average price of all products. Order the result set in descending order by price.
+
+2 | Hae tuotteet joiden hinta on korkeampi kuin kaikkien tuotteiden keskihinta. Järjestä tulosjoukko hinnan mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+select ProductID, ProductName, Price
+from products
+where Price >
+	(select avg(Price)
+	from products)
+order by Price desc;
+--------------------------------------------------
+
+##################################################
+3 | Select employees who have been processing at least two orders.
+Present employees full name in one column (for example "Emily Johnson") and amount of orders in the other.
+Use column names full_name and amount for these two columns. Order the result set by amount in descending order.
+
+3 | Hae työntekijät, jotka ovat käsitelleet vähintään kaksi tilausta.
+Esitä työntekijän kokonimi yhdessä sarakkeessa (esimerkiksi "Emily Johnson") ja tilausten määrä toisessa sarakkeessa.
+Käytä sarakkeille aliasnimiä full_name ja amount. Järjestä tulosjoukko tilausten määrän mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+select concat(firstName, ' ', Lastname) as full_name, count(orders.EmployeeID) as amount
+from employees join orders
+on employees.EmployeeID = orders.EmployeeID
+group by full_name
+having amount >= 2
+order by amount desc;
+--------------------------------------------------
+
+##################################################
+4 | Count how many products each shipper has transferred. Product quantity must be taken into account! Present shippername and product count in the result set.
+
+4 | Laske kuinka monta tuotetta kukin kuljetusyritys on kuljettanut. Tuotteiden määrä on otettava huomioon! Esitä tulosjoukossa kuljetusyrityksen nimi ja tuotteiden lukumäärä.
+--------------------------------------------------
+select ShipperName, sum(orderdetails.Quantity) as product_count 
+from shippers
+join orders on shippers.shipperID = orders.ShipperID
+join orderdetails on orders.OrderID = orderdetails.OrderID 
+group by ShipperName;
+--------------------------------------------------
+
+##################################################
+5 | Create the following two queries and combine them using the union statement.
+	- Select supplier names of suppliers having the price of their products lower than the average price of all products.
+	- Select supplier names of suppliers having contact name length higher than 12 characters.
+
+5 | Luo seuraavat kaksi kyselyä ja yhdistä ne käyttämällä UNION-lausetta:
+        - Hae toimittajien nimet, joiden tuotteiden hinta on alempi kuin kaikkien tuotteiden keskihinta.
+        - Hae toimittajien nimet, joiden yhteyshenkilön nimi on yli 12 merkkiä pitkä.
+--------------------------------------------------
+select SupplierName
+from suppliers
+join products on suppliers.SupplierID = products.SupplierID
+where price < (select avg(price) from products) 
+union
+select SupplierName
+from suppliers
+join products on suppliers.SupplierID = products.SupplierID
+where length(SupplierName) > 12;
+--------------------------------------------------
+
+##################################################
+6 | Show the TOP 5 countries from which customers placed the most orders.
+
+6 | Näytä viisi maata, joista asiakkaat ovat tehneet eniten tilauksia.
+--------------------------------------------------
+select country 
+from customers
+join orders on customers.CustomerID = orders.CustomerID
+group by Country
+order by count(country) desc
+limit 5;
+--------------------------------------------------
+
+##################################################
+7 | Use union to combine these queries:
+	- Select customers whose city and postalcode both appear in suppliers table.
+	- Select customers whose name is at most five characters shorter than the longest supplier name. 
+
+7 | Yhdistä seuraavat kyselyt union-operaatiolla:
+        - Hae asiakkaat, joiden kaupunki ja postinumero esiintyvät molemmat suppliers-taulussa.
+        - Hae asiakkaat, joiden nimi on korkeintaan viisi merkkiä lyhyempi kuin pisimmän toimittajan nimi.
+--------------------------------------------------
+select CustomerID, CustomerName, City, PostalCode 
+from customers
+where (City, PostalCode) in 
+	(select City, PostalCode
+    	from suppliers)
+		union
+select CustomerID, CustomerName, City, PostalCode
+from customers
+where length(CustomerName) <=
+	(select max(length(SupplierName)) -5
+	from suppliers);
+--------------------------------------------------
+
+##################################################
+8 |  Create the following two queries and combine them using the union statement:
+	- Select customer names who have not made any orders.
+	- Select customer names who have ordered at least one product with product price over 100.
+
+8 |  Luo seuraavat kaksi kyselyä ja yhdistä ne käyttämällä UNION-lausetta:
+        - Hae asiakkaiden nimet, jotka eivät ole tehneet yhtään tilausta.
+        - Hae asiakkaiden nimet, jotka ovat tilanneet vähintään yhden tuotteen, jonka hinta on yli 100.
+--------------------------------------------------
+select CustomerName 
+from customers
+where not exists
+	(select *
+    from orders
+    where customers.CustomerID = orders.CustomerID)
+union
+select CustomerName
+from customers
+join orders on customers.customerID = orders.CustomerID
+join orderdetails on orders.OrderID = orderdetails.OrderID
+join products on orderdetails.ProductID = products.ProductID
+where price > 100;
+--------------------------------------------------
+
+##################################################
+9 | Present suppliers whose units of products it delivers can be measured in boxes.
+
+9 | Näytä toimittajat, joiden toimittamien tuotteiden yksiköt voidaan mitata laatikoissa (boxes).
+--------------------------------------------------
+select distinct products.SupplierID, suppliers.SupplierName
+from products, suppliers
+where products.SupplierID = suppliers.SupplierID
+and Unit like '%box%';
+--------------------------------------------------
+
+##################################################
+10 | Present total price for each order. Include only orders with 5 or more products. Order the result set by order total price in descending order.
+
+10 | Esitä kunkin tilauksen kokonaishinta. Näytä tulosjoukossa vain tilaukset, joissa on 5 tai useampi tuote. Järjestä tulosjoukko tilauksen kokonaishinnan mukaan laskevassa järjestyksessä.
+--------------------------------------------------
+select orders.OrderID, sum(Price) as Total_Price
+from orders
+join orderdetails on orders.OrderID = orderdetails.OrderID
+join products on orderdetails.ProductID = products.ProductID
+group by orders.OrderID
+having count(orderdetails.OrderID) >= 5
+Order by Total_Price desc;
+--------------------------------------------------
