@@ -15,6 +15,8 @@ This repository contains exercises and projects completed during my open univers
 
 | [python-programming-basics-2024-2025/python-exercises](./python-programming-basics-2024-2025/python-exercises) | 🐍 **Python Exercises** – Programming basics course tasks. Covers topics like variables, functions, file handling, exceptions, and more. |
 
+| [databases-2024](./databases-2024) | 💾 **Databases** – Assignments from the Databases course (JAMK Open University, 2024). |
+
 ---
 
 ## 📜 License
